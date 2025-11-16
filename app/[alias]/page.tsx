@@ -9,18 +9,21 @@ export default async function AliasRedirect({
 }) {
   const { alias } = await params;
 
+  let urlDoc = null;
+
   try {
     const client = await clientPromise;
     const db = client.db('urlshortener');
     const collection = db.collection('urls');
 
-    const urlDoc = await collection.findOne({ alias });
-
-    if (urlDoc && urlDoc.url) {
-      redirect(urlDoc.url);
-    }
+    urlDoc = await collection.findOne({ alias });
   } catch (error) {
     console.error('Error fetching URL:', error);
+  }
+
+  // Redirect if URL found (outside try-catch so redirect error can propagate)
+  if (urlDoc && urlDoc.url) {
+    redirect(urlDoc.url);
   }
 
   // If no URL found or error, show 404 message
