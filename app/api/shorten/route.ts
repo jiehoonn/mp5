@@ -67,8 +67,17 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating shortened URL:', error);
+
+    // More detailed error logging for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', errorMessage);
+
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        // Include error details in development/debugging
+        ...(process.env.NODE_ENV === 'development' && { details: errorMessage })
+      },
       { status: 500 }
     );
   }
